@@ -1,0 +1,109 @@
+function pryamoug_bord(r::Robot)
+  while isborder(r,Ost)==false || isborder(r,Sud)==false
+    moves!(r,Sud)
+    moves!(r,Ost)
+  end
+  numbord=0
+  maxS=0
+  Square=0
+  while isborder(r,Nord)==false || isborder(r,Ost)==false
+    for side in(West,Ost)
+      if isborder(r,Nord)==true && isborder(r,Ost)==true
+        break
+      end
+      Square=search_bord(r,side,num_steps)
+      if Square>maxS
+        maxS=Square
+      end
+      if isborder(r,Nord)==false
+        move!(r,Nord)
+      end
+    end
+  end
+  print(maxS)
+end
+
+
+function search_bord(r::Robot,side::HorizonSide,numsteps::Int)
+  numbord=0
+  Square=0
+  num_steps=0
+  num_dlina=0
+  state=false
+  while numsteps!=0
+    if isborder(r,side)==false
+      move!(r,side)
+        numsteps-=1
+        if isborder(r,Nord)==true
+          state=true
+          numbord+=1
+        else
+          state=false
+          if numbord>0
+            num_dlina=numbord
+            Square=check(r,side,num_dlina)  
+          end
+          numbord=0
+        end
+    else
+      while isborder(r,side)==true
+        move!(r,Sud)
+        num_steps+=1
+      end
+      move!(r,side)
+      numsteps-=1 
+      while isborder(r,Nord)==true
+        move!(r,side)    
+        numsteps-=1
+      end
+      for _ in 1:num_steps
+        move!(r,Nord)
+      end
+      num_steps=0
+    end
+  end
+  return(Square)
+end
+
+function check(r::Robot,side::HorizonSide,numdlina::Int)
+  back=0
+  num_shirina=0
+  Square=0
+  move!(r,Nord)
+  if isborder(r,inverse(side))==true
+    num_shirina=shirina(r,side)
+    for _ in 1:num_shirina+1
+      move!(r,Sud)
+    end
+  else
+    move!(r,Sud)
+  end
+  Square=num_shirina*numdlina
+  return(Square)
+end
+
+function shirina(r::Robot,side::HorizonSide)
+  num_shirina=0
+  while isborder(r,inverse(side))==true
+    num_shirina+=1
+    move!(r,Nord)
+  end
+  return(num_shirina)    
+end
+
+inverse(side::HorizonSide)=HorizonSide(mod(Int(side)+2,4))
+
+function moves!(r::Robot,side::HorizonSide)
+  while isborder(r,side)==false
+    move!(r,side)
+  end
+end
+
+function moveto!(r::Robot,side::HorizonSide)
+  num_steps=0
+  while isborder(r,side)==false
+    move!(r,side)
+    num_steps+=1
+  end
+  return num_steps
+end
