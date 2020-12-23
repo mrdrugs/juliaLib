@@ -6,13 +6,7 @@ num_steps+=1
 end
 return num_steps
 end
-            
-function movements!(r,sides::NTuple{2,HorizonSide},num_steps::Vector{Any})
-for (i,n) in enumerate(num_steps)
-movements!(r,sides[mod(i-1,length(sides))+1],n)
-end
-end
-                    
+
 function through_rectangles_into_angle(r,angle::NTuple{2,HorizonSide})
 num_steps=[]
 while (isborder(r,angle[1])==false || isborder(r,angle[2])==false)
@@ -21,7 +15,7 @@ push!(num_steps,get_num_movements!(r,angle[1]))
 end
 return num_steps
 end
-    
+
 function move_if_possible!(r::Robot, direct_side::HorizonSide)::Bool
 left_side=HorizonSide(mod(Int(direct_side)-1,4))
 right_side=HorizonSide(mod(Int(left_side)+2,4))
