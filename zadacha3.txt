@@ -1,7 +1,29 @@
-include("../roblib.jl")
+function through_rectangles_into_angle(r,angle::NTuple{2,HorizonSide})
+num_steps=[]
+while (isborder(r,angle[1])==false || isborder(r,angle[2])==false)
+push!(num_steps,get_num_movements!(r,angle[2]))
+push!(num_steps,get_num_movements!(r,angle[1]))
+end
+return num_steps
+end
+
+function movements!(r,sides::NTuple{2,HorizonSide},num_steps::Vector{Any})
+for (i,n) in enumerate(num_steps)
+movements!(r,sides[mod(i-1,length(sides))+1],n)
+end
+end
+    
+function through_rectangles_into_angle(r,angle::NTuple{2,HorizonSide})
+num_steps=[]
+while (isborder(r,angle[1])==false || isborder(r,angle[2])==false)
+push!(num_steps, get_num_movements!(r,angle[2]))
+push!(num_steps, get_num_movements!(r,angle[1]))
+end
+return num_steps
+end
 
 function mark_all_cells(r)
-num_steps=through_rectangles_into_angle(r,(Down, Left))
+num_steps=through_rectangles_into_angle(r,(Down,Left))
 side=Right
 while (isborder(r,Up)==false) || (isborder(r,Right)==false)
 putmarkers!(r,side)
