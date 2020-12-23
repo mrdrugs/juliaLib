@@ -1,13 +1,11 @@
 import HorizonSideRobots: isborder
-include("../roblib.jl")
 
-function mark_kross_x(r::Robot)
-for side in ((Up,Right),(Down,Right),(Down,Left),(Up,Left))
-move_and_putmarkers_diagonal!(r,side)
-return_back!(r,side)
+function move_diagonal!(r::Robot,side::NTuple{2,HorizonSide})
+move!(r,side[1])
+move!(r,side[2])
 end
-putmarker!(r)
-end
+isborder(r::Robot,side::NTuple{2,HorizonSide})::Bool=(isborder(r,side[1]) || isborder(r,side[2]))
+inverse(side::NTuple{2,HorizonSide})=(inverse(side[1]),inverse(side[2]))
 
 function move_and_putmarkers_diagonal!(r::Robot,side::NTuple{2,HorizonSide})
 while isborder(r,side)==false
@@ -22,9 +20,10 @@ move_diagonal!(r,inverse(side))
 end
 end
 
-function move_diagonal!(r::Robot,side::NTuple{2,HorizonSide})
-move!(r,side[1])
-move!(r,side[2])
+function mark_kross_x(r::Robot)
+for side in ((Nord,Ost),(Sud,Ost),(Sud,West),(Nord,West))
+move_and_putmarkers_diagonal!(r,side)
+return_back!(r,side)
 end
-isborder(r::Robot,side::NTuple{2,HorizonSide})::Bool=(isborder(r,side[1]) || isborder(r,side[2]))
-inverse(side::NTuple{2,HorizonSide})=(inverse(side[1]),inverse(side[2]))
+putmarker!(r)
+end
