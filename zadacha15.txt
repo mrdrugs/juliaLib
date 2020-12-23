@@ -6,13 +6,7 @@ num_steps+=1
 end
 return num_steps
 end
-        
-function movements!(r,sides::NTuple{2,HorizonSide},num_steps::Vector{Any})
-for (i,n) in enumerate(num_steps)
-movements!(r,sides[mod(i-1,length(sides))+1],n)
-end
-end
-                
+
 function through_rectangles_into_angle(r,angle::NTuple{2,HorizonSide})
 num_steps=[]
 while (isborder(r,angle[1])==false || isborder(r,angle[2])==false)
