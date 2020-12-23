@@ -1,16 +1,27 @@
-include("../roblib.jl")
-
-function mark_ladder(r)
-num_steps=through_rectangles_into_angle(r,(Down,Left))
-cell_to_mark=mark_and_enumerate!(r,Right)-1
-while isborder(r,Up)==false
-movements!(r,Left)
-move!(r,Up)
-putmarkers!(r,Right,cell_to_mark)
-cell_to_mark-=1
+function get_num_movements!(r::Robot,side::HorizonSide)
+num_steps=0
+while isborder(r,side)==false 
+move!(r,side) 
+num_steps+=1    
 end
-through_rectangles_into_angle(r,(Down,Left))
-movements!(r,(Up,Right),reverse(num_steps))
+return num_steps
+end
+
+movements!(r::Robot,side::HorizonSide)=while isborder(r,side)==false move!(r,side) end
+
+function movements!(r,sides::NTuple{2,HorizonSide},num_steps::Vector{Any})
+for (i,n) in enumerate(num_steps)
+movements!(r,sides[mod(i-1,length(sides))+1],n)
+end
+end
+    
+function through_rectangles_into_angle(r,angle::NTuple{2,HorizonSide})
+num_steps=[]
+while (isborder(r,angle[1])==false || isborder(r,angle[2])==false)
+push!(num_steps,get_num_movements!(r,angle[2]))
+push!(num_steps,get_num_movements!(r,angle[1]))
+end
+return num_steps
 end
 
 function mark_and_enumerate!(r,side)
@@ -22,4 +33,17 @@ putmarker!(r)
 steps+=1
 end
 return steps 
+end
+
+function mark_ladder(r)
+num_steps=through_rectangles_into_angle(r,(Sud,West))
+cell_to_mark=mark_and_enumerate!(r,Ost)-1
+while isborder(r,Nord)==false
+movements!(r,West)
+move!(r,Nord)
+putmarkers!(r,Ost,cell_to_mark)
+cell_to_mark-=1
+end
+through_rectangles_into_angle(r,(Down,West))
+movements!(r,(Nord,Ost),reverse(num_steps))
 end
