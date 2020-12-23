@@ -17,7 +17,7 @@ return num_steps
 end
 
 function move_if_possible!(r::Robot, direct_side::HorizonSide)::Bool
-left_side=right(direct_side)
+left_side=HorizonSide(mod(Int(direct_side)-1,4))
 right_side=inverse(left_side)
 num_of_steps=0
 if isborder(r,direct_side)==false
