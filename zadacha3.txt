@@ -23,15 +23,15 @@ return num_steps
 end
 
 function mark_all_cells(r)
-num_steps=through_rectangles_into_angle(r,(Down,Left))
-side=Right
-while (isborder(r,Up)==false) || (isborder(r,Right)==false)
+num_steps=through_rectangles_into_angle(r,(Sud,West))
+side=Ost 
+while (isborder(r,Nord)==false) || (isborder(r,Ost)==false)
 putmarkers!(r,side)
-if (isborder(r,Up)==false) || (isborder(r,Right)==false)
-move!(r,Up)
+if (isborder(r,Nord)==false) || (isborder(r,Ost)==false)
+move!(r,Nord)
 end
 side=inverse(side)
 end
-through_rectangles_into_angle(r,(Down,Left))
-movements!(r,(Up,Right),reverse(num_steps))
+through_rectangles_into_angle(r,(Sud,West))
+movements!(r,(Nord,Ost),reverse(num_steps))
 end
