@@ -1,14 +1,36 @@
-include("../roblib.jl")
+function get_num_movements!(r::Robot,side::HorizonSide)
+num_steps=0
+while isborder(r,side)==false 
+move!(r,side) 
+num_steps+=1    
+end
+return num_steps
+end
+
+function movements!(r,sides::NTuple{2,HorizonSide},num_steps::Vector{Any})
+for (i,n) in enumerate(num_steps)
+movements!(r,sides[mod(i-1,length(sides))+1],n)
+end
+end
+        
+function through_rectangles_into_angle(r,angle::NTuple{2,HorizonSide})
+num_steps=[]
+while (isborder(r,angle[1])==false || isborder(r,angle[2])==false)
+push!(num_steps,get_num_movements!(r,angle[2]))
+push!(num_steps,get_num_movements!(r,angle[1]))
+end
+return num_steps
+end
 
 function mark_angels(r)
-num_steps=through_rectangles_into_angle(r,(Down,Left))
+num_steps=through_rectangles_into_angle(r,(Sud,West))
 putmarker!(r)
-through_rectangles_into_angle(r,(Up,Left))
+through_rectangles_into_angle(r,(Nord,West))
 putmarker!(r)
-through_rectangles_into_angle(r,(Up,Right))
+through_rectangles_into_angle(r,(Nord,Ost))
 putmarker!(r)
-through_rectangles_into_angle(r,(Down,Right))
+through_rectangles_into_angle(r,(Sud,Ost))
 putmarker!(r)
-through_rectangles_into_angle(r,(Down,Left))
-movements!(r,(Up,Right),reverse(num_steps))
+through_rectangles_into_angle(r,(Sud,West))
+movements!(r,(Nord,Ost),reverse(num_steps))
 end
