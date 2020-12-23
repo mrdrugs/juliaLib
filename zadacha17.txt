@@ -1,25 +1,66 @@
-include("../roblib.jl")
+function get_num_movements!(r::Robot,side::HorizonSide)
+num_steps=0
+while isborder(r,side)==false 
+move!(r,side) 
+num_steps+=1    
+end
+return num_steps
+end
+                
+function through_rectangles_into_angle(r,angle::NTuple{2,HorizonSide})
+num_steps=[]
+while (isborder(r,angle[1])==false || isborder(r,angle[2])==false)
+push!(num_steps,get_num_movements!(r,angle[2]))
+push!(num_steps,get_num_movements!(r,angle[1]))
+end
+return num_steps
+end
 
-function mark_ladder(r)
-num_steps=through_rectangles_into_angle(r,(Down,Left))
-cells_in_raw=mark_and_enumerate_if_possible!(r,Right)
-cells_to_mark=cells_in_raw-1
-while (isborder(r,Up)==false) || (isborder(r,Left)==false)
-movements_if_possible!(r,Left)
-if (isborder(r,Up)==false)
-move!(r,Up)
+function move_if_possible!(r::Robot, direct_side::HorizonSide)::Bool
+left_side=right(direct_side)
+right_side=inverse(left_side)
+num_of_steps=0
+if isborder(r,direct_side)==false
+move!(r,direct_side)
+result=true
+else
+while isborder(r,direct_side)==true
+if isborder(r,left_side)==false
+move!(r,left_side)
+num_of_steps+=1
+else
+break
 end
-cells_to_not_mark=cells_in_raw-get_num_movements_if_possible!(r,Right)
-movements_if_possible!(r,Left,cells_in_raw)
-cells_remained = move_and_check(r, Right, cells_to_mark)
-if ((cells_remained-cells_to_not_mark)>0)
-putmarkers_if_possible!(r,Right,cells_remained-cells_to_not_mark)
 end
-cells_to_mark-=1
+if isborder(r,direct_side)==false
+move!(r,direct_side)
+while isborder(r,right_side)==true
+move!(r,direct_side)
 end
-through_rectangles_into_angle(r,(Down,Left))
-movements_if_possible!(r,(Up,Right),reverse(num_steps))
+result=true
+else
+result=false
 end
+while num_of_steps>0
+num_of_steps-=1
+move!(r,right_side)
+end
+end
+return result
+end
+
+function mark_and_enumerate_if_possible!(r::Robot,side::HorizonSide)
+num_steps=0 
+putmarker!(r)
+while move_if_possible!(r,side)==true
+putmarker!(r)
+num_steps+=1
+end 
+return num_steps
+end
+
+movements_if_possible!(r::Robot,side::HorizonSide)=while isborder(r,side)==false move_if_possible!(r,side) end
+movements_if_possible!(r::Robot,side::HorizonSide, num_steps::Int)=for _ in 1:num_steps move_if_possible!(r,side) end
 
 function move_and_check(r,side,count)
 putmarker!(r)
@@ -29,4 +70,42 @@ putmarker!(r)
 count-=1
 end
 return count
+end
+
+function get_num_movements_if_possible!(r::Robot,side::HorizonSide)
+num_steps=0 
+while move_if_possible!(r,side)==true
+num_steps+=1
+end 
+return num_steps
+end
+
+function putmarkers_if_possible!(r::Robot,side::HorizonSide,count::Int)
+putmarker!(r)
+while count!=0
+move_if_possible!(r,side)
+putmarker!(r)
+count-=1
+end
+end
+
+function mark_ladder(r)
+num_steps=through_rectangles_into_angle(r,(Sud,West))
+cells_in_raw=mark_and_enumerate_if_possible!(r,Ost)
+cells_to_mark=cells_in_raw-1
+while (isborder(r,Nord)==false) || (isborder(r,West)==false)
+movements_if_possible!(r,West)
+if (isborder(r,Nord)==false)
+move!(r,Nord)
+end
+cells_to_not_mark=cells_in_raw-get_num_movements_if_possible!(r,Ost)
+movements_if_possible!(r,West,cells_in_raw)
+cells_remained = move_and_check(r,Ost,cells_to_mark)
+if ((cells_remained-cells_to_not_mark)>0)
+putmarkers_if_possible!(r,Ost,cells_remained-cells_to_not_mark)
+end
+cells_to_mark-=1
+end
+through_rectangles_into_angle(r,(Sud,West))
+movements_if_possible!(r,(Nord,Ost),reverse(num_steps))
 end
