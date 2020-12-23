@@ -27,6 +27,6 @@ through_rectangles_into_angle(r,(Nord,Ost))
 putmarker!(r)
 through_rectangles_into_angle(r,(Sud,Ost))
 putmarker!(r)
-through_rectangles_into_angle(r,(Sud,Sud))
+through_rectangles_into_angle(r,(Sud,West))
 movements_if_possible!(r,(Nord,Ost),reverse(num_steps))
 end
