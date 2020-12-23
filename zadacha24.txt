@@ -93,12 +93,6 @@ end
 
 inverse(side::HorizonSide)=HorizonSide(mod(Int(side)+2,4))
 
-function moves!(r::Robot,side::HorizonSide)
-  while isborder(r,side)==false
-    move!(r,side)
-  end
-end
-
 function moveto!(r::Robot,side::HorizonSide)
   num_steps=0
   while isborder(r,side)==false
