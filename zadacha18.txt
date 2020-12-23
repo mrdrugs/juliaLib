@@ -21,7 +21,7 @@ movements_if_possible!(r::Robot,side::HorizonSide,num_steps::Int)=for _ in 1:num
 function mark_angels(r)
 num_steps=through_rectangles_into_angle(r,(Sud,West))
 putmarker!(r)
-through_rectangles_into_angle(r,(Nord,Sud))
+through_rectangles_into_angle(r,(Nord,West))
 putmarker!(r)
 through_rectangles_into_angle(r,(Nord,Ost))
 putmarker!(r)
